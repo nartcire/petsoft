@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Pet } from "@/lib/types";
 import PetButton from "./pet-button";
+import { deletePet } from "@/actions/actions";
 import { usePetContext } from "@/lib/hooks";
 
 export default function PetDetails() {
@@ -58,7 +59,7 @@ function TopBar({ selectedPet }: Props) {
         <PetButton actionType="edit">Edit</PetButton>
         <PetButton
           actionType="checkout"
-          onClick={() => handleCheckoutPet(selectedPet.id)}
+          onClick={async () => await deletePet(selectedPet.id)}
         >
           Checkout
         </PetButton>

@@ -1,9 +1,12 @@
 "use client";
 
-import { Button } from "./ui/button";
+import { addPet, editPet } from "@/actions/actions";
+
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import PetFormBtn from "./pet-form-btn";
 import { Textarea } from "./ui/textarea";
+import { toast } from "sonner";
 import { usePetContext } from "@/lib/hooks";
 
 type PetFormProps = {
@@ -17,31 +20,29 @@ export default function PetForm({
 }: PetFormProps) {
   const { handleAddPet, selectedPet, handleEditPet } = usePetContext();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const pet = {
-      name: formData.get("name") as string,
-      ownerName: formData.get("ownerName") as string,
-      imageUrl:
-        (formData.get("imageUrl") as string) ||
-        "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
-      age: +(formData.get("age") as string),
-      notes: formData.get("notes") as string,
-    };
-
-    if (actionType === "add") {
-      handleAddPet(pet);
-    } else if (actionType === "edit") {
-      handleEditPet(selectedPet!.id, pet);
-    }
-
-    onFormSubmission();
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form
+      action={async (formData) => {
+        if (actionType === "add") {
+          const error = await addPet(formData);
+
+          if (error) {
+            toast.warning(error.message);
+            return;
+          }
+        } else if (actionType === "edit") {
+          const error = await editPet(selectedPet?.id, formData);
+
+          if (error) {
+            toast.warning(error.message);
+            return;
+          }
+        }
+
+        onFormSubmission();
+      }}
+      className="flex flex-col"
+    >
       <div className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="name">Name</Label>
@@ -94,9 +95,7 @@ export default function PetForm({
         </div>
       </div>
 
-      <Button type="submit" className="mt-5 self-end">
-        {actionType === "add" ? "Add a new pet" : "Edit pet"}
-      </Button>
+      <PetFormBtn />
     </form>
   );
 }

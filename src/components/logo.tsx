@@ -5,7 +5,7 @@ import logo from "../../public/logo.svg";
 export default function Logo() {
   return (
     <Link href="/">
-      <Image src={logo} alt="Petsoft Logo" />;
+      <Image src={logo} alt="Petsoft Logo" />
     </Link>
   );
 }

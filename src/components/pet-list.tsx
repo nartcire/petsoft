@@ -6,10 +6,11 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export default function PetList() {
-  const { pets, selectedPetId, handleChangeSelectedPetId } = usePetContext();
+  const { optimisticPets, selectedPetId, handleChangeSelectedPetId } =
+    usePetContext();
   const { searchQuery } = useSearchContext();
 
-  const filteredPets = pets.filter((pet) =>
+  const filteredPets = optimisticPets.filter((pet) =>
     pet.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

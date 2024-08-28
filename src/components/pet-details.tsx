@@ -3,14 +3,12 @@
 import { startTransition, useTransition } from "react";
 
 import Image from "next/image";
-import { Pet } from "@/lib/types";
+import { Pet } from "@prisma/client";
 import PetButton from "./pet-button";
-import { deletePet } from "@/actions/actions";
 import { usePetContext } from "@/lib/hooks";
 
 export default function PetDetails() {
   const { selectedPet } = usePetContext();
-  const [isPending, startTransition] = useTransition();
 
   return (
     <section className="flex flex-col h-full w-full">
@@ -47,7 +45,7 @@ function TopBar({ selectedPet }: Props) {
   return (
     <div className="flex items-center bg-white px-8 py-5 border-b border-light">
       <Image
-        src={selectedPet?.imageUrl}
+        src={selectedPet.imageUrl}
         alt="Selected pet image"
         height={75}
         width={75}
@@ -55,18 +53,15 @@ function TopBar({ selectedPet }: Props) {
       />
 
       <h2 className="text-3xl font-semibold leading-7 ml-5">
-        {selectedPet?.name}
+        {selectedPet.name}
       </h2>
 
       <div className="ml-auto space-x-3">
         <PetButton actionType="edit">Edit</PetButton>
         <PetButton
           actionType="checkout"
-          disabled={isPending}
           onClick={async () => {
-            startTransition(async () => {
-              await deletePet(selectedPet.id);
-            });
+            await handleCheckoutPet(selectedPet.id);
           }}
         >
           Checkout

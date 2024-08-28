@@ -11,6 +11,7 @@ import {
 import { Button } from "./ui/button";
 import PetForm from "./pet-form";
 import { PlusIcon } from "@radix-ui/react-icons";
+import { flushSync } from "react-dom";
 import { useState } from "react";
 
 type PetButtonProps = {
@@ -56,7 +57,9 @@ export default function PetButton({
         <PetForm
           actionType={actionType}
           onFormSubmission={() => {
-            setIsFormOpen(false);
+            flushSync(() => {
+              setIsFormOpen(false);
+            });
           }}
         />
       </DialogContent>

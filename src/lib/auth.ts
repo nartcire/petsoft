@@ -41,15 +41,22 @@ const config = {
   ],
   // This is run when the user attempts to log in
   callbacks: {
-    authorized: ({ request }) => {
+    authorized: ({ auth, request }) => {
       // runs on every request with middleware
+      const isLoggedIn = Boolean(auth?.user);
       const isTryingToAccessApp = request.nextUrl.pathname.includes("/app");
 
-      if (isTryingToAccessApp) {
+      if (!isTryingToAccessApp) {
+        return true;
+      }
+
+      if (!isLoggedIn && isTryingToAccessApp) {
         return false;
       }
 
-      return true;
+      if (isLoggedIn && isTryingToAccessApp) {
+        return true;
+      }
     },
   },
 } satisfies NextAuthConfig;

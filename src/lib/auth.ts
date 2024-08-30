@@ -65,6 +65,23 @@ const config = {
 
       return false;
     },
+    jwt: ({ token, user }) => {
+      // on sign in --- Need to do this in order to store info on token
+      // but cannot directly access this information
+      if (user) {
+        token.userId = user.id;
+      }
+
+      return token;
+    },
+    session: ({ session, token }) => {
+      // This info is made availlable to the client
+      if (session.user) {
+        session.user.id = token.userId;
+      }
+
+      return session;
+    },
   },
 } satisfies NextAuthConfig;
 

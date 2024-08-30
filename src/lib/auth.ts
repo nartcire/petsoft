@@ -46,7 +46,12 @@ const config = {
       const isLoggedIn = Boolean(auth?.user);
       const isTryingToAccessApp = request.nextUrl.pathname.includes("/app");
 
-      if (!isTryingToAccessApp) {
+      // User is logged in but we want to redirect them to the private portion of the app
+      if (isLoggedIn && !isTryingToAccessApp) {
+        return Response.redirect(new URL("/app/dashboard", request.nextUrl));
+      }
+
+      if (!isLoggedIn && !isTryingToAccessApp) {
         return true;
       }
 
@@ -57,6 +62,8 @@ const config = {
       if (isLoggedIn && isTryingToAccessApp) {
         return true;
       }
+
+      return false;
     },
   },
 } satisfies NextAuthConfig;

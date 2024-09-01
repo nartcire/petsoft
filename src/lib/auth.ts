@@ -49,16 +49,32 @@ const config = {
       const isLoggedIn = Boolean(auth?.user);
       const isTryingToAccessApp = request.nextUrl.pathname.includes("/app");
 
+      if (!isLoggedIn && isTryingToAccessApp) {
+        return false;
+      }
+
+      if (isLoggedIn && isTryingToAccessApp && !auth?.user.hasAccess) {
+        return Response.redirect(new URL("/payment", request.nextUrl));
+      }
+
       if (isLoggedIn && isTryingToAccessApp && auth?.user.hasAccess) {
         return true;
       }
 
-      // User is logged in but we want to redirect them to the private portion of the app
-      if (isLoggedIn && !isTryingToAccessApp) {
+      if (
+        isLoggedIn &&
+        (request.nextUrl.pathname.includes("/login") ||
+          request.nextUrl.pathname.includes("/signup")) &&
+        auth?.user.hasAccess
+      ) {
+        return Response.redirect(new URL("/app/dashboard", request.nextUrl));
+      }
+
+      if (isLoggedIn && !isTryingToAccessApp && !auth?.user.hasAccess) {
+        // User is logged in but we want to redirect them to the private portion of the app
         if (
-          (request.nextUrl.pathname.includes("/login") ||
-            request.nextUrl.pathname.includes("/signup")) &&
-          !auth?.user.hasAccess
+          request.nextUrl.pathname.includes("/login") ||
+          request.nextUrl.pathname.includes("/signup")
         ) {
           return Response.redirect(new URL("/payment", request.nextUrl));
         } else {
@@ -68,14 +84,6 @@ const config = {
 
       if (!isLoggedIn && !isTryingToAccessApp) {
         return true;
-      }
-
-      if (!isLoggedIn && isTryingToAccessApp) {
-        return false;
-      }
-
-      if (isLoggedIn && isTryingToAccessApp && !auth?.user.hasAccess) {
-        return Response.redirect(new URL("/payment", request.nextUrl));
       }
 
       return false;

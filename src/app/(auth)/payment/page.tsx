@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import H1 from "@/components/h1";
 import { createCheckoutSession } from "@/actions/actions";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useTransition } from "react";
 
 export default function Page({
@@ -11,10 +13,24 @@ export default function Page({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const [isPending, startTransition] = useTransition();
+  const { data: session, update, status } = useSession();
+  const router = useRouter();
 
   return (
     <main className="flex flex-col items-center space-y-10">
       <H1>PetSoft access requires payment</H1>
+
+      {searchParams.success && (
+        <Button
+          onClick={async () => {
+            await update(true);
+            router.push("/app/dashboard");
+          }}
+          disabled={status === "loading" || session?.user.hasAccess}
+        >
+          Access PetSoft
+        </Button>
+      )}
 
       {!searchParams.success && (
         <Button

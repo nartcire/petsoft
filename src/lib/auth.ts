@@ -49,6 +49,10 @@ const config = {
       const isLoggedIn = Boolean(auth?.user);
       const isTryingToAccessApp = request.nextUrl.pathname.includes("/app");
 
+      if (isLoggedIn && isTryingToAccessApp && auth?.user.hasAccess) {
+        return true;
+      }
+
       // User is logged in but we want to redirect them to the private portion of the app
       if (isLoggedIn && !isTryingToAccessApp) {
         if (
@@ -70,32 +74,34 @@ const config = {
         return false;
       }
 
-      if (isLoggedIn && isTryingToAccessApp && auth?.user.hasAccess) {
-        return true;
-      }
-
       if (isLoggedIn && isTryingToAccessApp && !auth?.user.hasAccess) {
         return Response.redirect(new URL("/payment", request.nextUrl));
       }
 
       return false;
     },
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user, trigger }) => {
       // on sign in --- Need to do this in order to store info on token
       // but cannot directly access this information
       if (user) {
         token.userId = user.id;
+        token.email = user.email!;
         token.hasAccess = user.hasAccess;
+      }
+
+      if (trigger === "update") {
+        const userFromDb = await getUserByEmail(token.email);
+        if (userFromDb) {
+          token.hasAccess = userFromDb.hasAccess;
+        }
       }
 
       return token;
     },
     session: ({ session, token }) => {
       // This info is made availlable to the client
-      if (session.user) {
-        session.user.id = token.userId;
-        session.user.hasAccess = token.hasAccess;
-      }
+      session.user.id = token.userId;
+      session.user.hasAccess = token.hasAccess;
 
       return session;
     },

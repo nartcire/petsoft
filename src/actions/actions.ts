@@ -4,6 +4,7 @@ import { auth, signIn, signOut } from "@/lib/auth";
 import { authSchema, petFormSchema, petIdSchema } from "@/lib/validations";
 import { checkAuth, getPetById } from "@/lib/server-utils";
 
+import { AuthError } from "next-auth";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import prisma from "@/lib/db";
@@ -12,7 +13,7 @@ import { revalidatePath } from "next/cache";
 import { sleep } from "@/lib/utils";
 
 // --- user actions ---
-export async function logIn(formData: unknown) {
+export async function logIn(prevState: unknown, formData: unknown) {
   await sleep(1000);
 
   // check if formData is a FormData type
@@ -22,9 +23,26 @@ export async function logIn(formData: unknown) {
     };
   }
 
-  await signIn("credentials", formData);
+  try {
+    await signIn("credentials", formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin": {
+          return {
+            message: "Invalid credentials.",
+          };
+        }
+        default: {
+          return {
+            message: "Error. Could not sign in.",
+          };
+        }
+      }
+    }
 
-  redirect("/app/dashboard");
+    throw error; // nextjs redirect throws error, so we need to rethrow it
+  }
 }
 
 export async function logOut() {

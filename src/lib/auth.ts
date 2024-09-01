@@ -51,7 +51,15 @@ const config = {
 
       // User is logged in but we want to redirect them to the private portion of the app
       if (isLoggedIn && !isTryingToAccessApp) {
-        return Response.redirect(new URL("/app/dashboard", request.nextUrl));
+        if (
+          (request.nextUrl.pathname.includes("/login") ||
+            request.nextUrl.pathname.includes("/signup")) &&
+          !auth?.user.hasAccess
+        ) {
+          return Response.redirect(new URL("/payment", request.nextUrl));
+        } else {
+          return true;
+        }
       }
 
       if (!isLoggedIn && !isTryingToAccessApp) {
@@ -62,8 +70,12 @@ const config = {
         return false;
       }
 
-      if (isLoggedIn && isTryingToAccessApp) {
+      if (isLoggedIn && isTryingToAccessApp && auth?.user.hasAccess) {
         return true;
+      }
+
+      if (isLoggedIn && isTryingToAccessApp && !auth?.user.hasAccess) {
+        return Response.redirect(new URL("/payment", request.nextUrl));
       }
 
       return false;
@@ -73,6 +85,7 @@ const config = {
       // but cannot directly access this information
       if (user) {
         token.userId = user.id;
+        token.hasAccess = user.hasAccess;
       }
 
       return token;
@@ -81,6 +94,7 @@ const config = {
       // This info is made availlable to the client
       if (session.user) {
         session.user.id = token.userId;
+        session.user.hasAccess = token.hasAccess;
       }
 
       return session;

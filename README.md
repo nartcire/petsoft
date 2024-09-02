@@ -20,7 +20,7 @@ This is the second project that I've done with NextJS. This is the final project
 - allows users to checkout their clients
 - allows users to edit information on their clients
 - allows users to add additional clients to their list and fill out information concerning their clients for their records
-- allows users to log out of their accounts to which they would need to log back in if they want access to the web app again'
+- allows users to log out of their accounts to which they would need to log back in if they want access to the web app again
 - used prism to help interact with our database
 - used Zod to help enforce the information submitted through forms as well as type check information in and out of the database
 - used tailwind css to style and format our website into a minimalistic and clean format

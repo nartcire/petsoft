@@ -14,7 +14,7 @@ This is the second project that I've done with NextJS. This is the final project
 - allow users to sign up for an account
 - allow users to log in to their existing account
 - used stripe to handle our transaction side of the web app
-- implemented middleware that will not allow the user to use the application unless they've paid for access to the web app through stripe]
+- implemented middleware that will not allow the user to use the application unless they've paid for access to the web app through stripe
 - allows users to keep track of furry clientele they may be watching over at the moment
 - allows users to observe various information on their clients like their name, age, picture, owner's name, and notes about their clients
 - allows users to checkout their clients
